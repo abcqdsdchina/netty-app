@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+option java_outer_classname = "EmployeeProto";
+
+package club.avence.netty.serializable.protobuf;
+message Employee {
+    string code = 1;
+    string name = 2;
+    string idCard = 3;
+}

@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>WebSocket</title>
+<script type="text/javascript" th:src="@{/plugins/jquery/3.3.1/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/plugins/vue/2.5.17/vue.js}"></script>
+<script type="text/javascript" th:src="@{/plugins/moment/2.22.2/moment-with-locales.min.js}"></script>
+<script type="text/javascript" th:src="@{/plugins/sockjs/1.3.0/sockjs.min.js}"></script>
+<script type="text/javascript" th:src="@{/plugins/stomp/1.7.1/stomp.min.js}"></script>
+<script type="text/javascript">
+$(function() {
+    var app = new Vue({
+        el: '#app',
+        data: {
+            socket: {},
+            user: '',
+            reciever: '',
+            text: '',
+            message: ''
+        },
+        methods: {
+            moment: moment,
+            send: function() {
+                app.socket.send(JSON.stringify({
+                    reciever: app.reciever,
+                    text: app.text
+                }));
+            },
+            broadcast: function() {
+                $.ajax({
+                    url: '/websocket/broadcast',
+                    method: 'post',
+                    data: {
+                        message: app.text
+                    }
+                }).fail(function(error) {
+                    console.log("群发消息失败.");
+                });
+            }
+        }
+    });
+
+    if (typeof(WebSocket) == 'undefined') {
+        console.log("浏览器不支持WebSocket.");
+    } else {
+        app.socket = new WebSocket("ws://localhost:8080/websocket/endpoint");
+        app.socket.onopen = function() {
+            console.log("Socket已连接.");
+        };
+        app.socket.onmessage = function(message) {
+            console.log("接收到消息: " + message);
+            app.message = message.data;
+        };
+        app.socket.onclose = function() {
+            console.log("Socket已关闭.");
+        };
+        app.socket.onerror = function() {
+            console.log("Socket连接出错了.");
+        };
+        window.onload = function() {
+            app.socket.close();
+        }
+    }
+});
+</script>
+</head>
+<body>
+<div id="app">
+    <div>收到消息：{{message}}</div>
+    <div>
+        <input v-model="text" type="text" placeholder="请输入要发送的消息" />
+        <input type="button" value="发送" @click="send" />
+        <input type="button" value="群发消息" @click="broadcast" />
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+server:
+  servlet:
+    context-path: /
+
+spring:
+  kafka:
+    bootstrap-servers: 172.17.0.2:9092
+    listener:
+      ack-mode: manual
+    consumer:
+      enable-auto-commit: false
+      group-id: kafka-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  rabbitmq:
+    host: 172.17.0.2
+    port: 5672
+    username: admin
+    password: admin
+    publisher-confirms: true
+    publisher-returns: true
+    virtual-host: /
+    template:
+      mandatory: true
+    listener:
+      simple:
+        acknowledge-mode: manual
+        concurrency: 5
+        max-concurrency: 5
+        prefetch: 100
+        retry:
+          enabled: true
+  redis:
+    cluster:
+      nodes: 172.17.0.2:6379, 172.17.0.2:6380, 172.17.0.2:6381, 172.17.0.2:6389, 172.17.0.2:6390, 172.17.0.2:6391
+  session:
+    store-type: redis

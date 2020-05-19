@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>WebSocket</title>
+<script type="text/javascript" th:src="@{/plugins/jquery/3.3.1/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/plugins/vue/2.5.17/vue.js}"></script>
+<script type="text/javascript" th:src="@{/plugins/moment/2.22.2/moment-with-locales.min.js}"></script>
+<script type="text/javascript" th:src="@{/plugins/sockjs/1.3.0/sockjs.min.js}"></script>
+<script type="text/javascript" th:src="@{/plugins/stomp/1.7.1/stomp.min.js}"></script>
+<script type="text/javascript">
+$(function() {
+    var client = Stomp.over(new SockJS("[(@{/endpoint})]"));
+    client.connect({}, function(frame) {
+        console.log("Connected: " + frame);
+    }, function(error) {
+        console.log("Connected error：" + error);
+    });
+    var app = new Vue({
+        el: '#app',
+        data: {
+            user: '',
+            reciever: '',
+            text: '',
+            message: ''
+        },
+        methods: {
+            moment: moment,
+            login: function() {
+                app.subscribe();
+            },
+            logout: function() {
+                client.disconnect(function() {
+                    console.log("Disconnected.");
+                });
+            },
+            subscribe: function() {
+                client.subscribe("/user/" + app.user + "/message", function(response) {
+                    app.message = response.body;
+                });
+
+                client.subscribe("/broadcast/message", function(response) {
+                    app.message = response.body;
+                });
+            },
+            send: function() {
+                client.send("/point", {}, JSON.stringify({
+                    reciever: app.reciever,
+                    text: app.text
+                }));
+            },
+            broadcast: function() {
+                client.send("/broadcast", {}, JSON.stringify({
+                    text: app.text
+                }));
+            }
+        }
+    });
+});
+</script>
+</head>
+<body>
+<div id="app">
+    <div>
+        <select v-model="user">
+            <option value="">请选择</option>
+            <option value="Mark">Mark</option>
+            <option value="James">James</option>
+        </select>
+        <input type="button" value="登陆" @click="login" />
+        <input type="button" value="退出" @click="logout" />
+    </div>
+    <div>收到消息：{{message}}</div>
+    <div>
+        <select v-model="reciever">
+            <option value="">请选择</option>
+            <option value="Mark">Mark</option>
+            <option value="James">James</option>
+        </select>
+        <input v-model="text" type="text" placeholder="请输入要发送的消息" />
+        <input type="button" value="发送" @click="send" />
+        <input type="button" value="群发消息" @click="broadcast" />
+    </div>
+</div>
+</body>
+</html>

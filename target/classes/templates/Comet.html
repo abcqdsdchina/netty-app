@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache;">
+<meta http-equiv="Expires" content="0">
+<title>Comet</title>
+<script type="text/javascript" th:src="@{/plugins/jquery/3.3.1/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/plugins/vue/2.5.17/vue.js}"></script>
+<script type="text/javascript" th:src="@{/plugins/moment/2.22.2/moment-with-locales.min.js}"></script>
+<script type="text/javascript">
+$(function() {
+    var app = new Vue({
+        el: '#app',
+        data: {
+            format: 'YYYY-MM-DD HH:mm:ss',
+            time: new Date(),
+            time2: new Date(),
+            time3: new Date(),
+            time4: new Date()
+        },
+        methods: {
+            moment: moment
+        }
+    });
+
+    setInterval(function() {
+        $.ajax({
+            url: "[(@{/short-polling/time})]",
+            method: "get"
+        }).done(function(response) {
+            app.time = response;
+        }).fail(function(error) {
+            console.log(error);
+        });
+    }, 3000);
+
+    (function loop() {
+        $.ajax({
+            url: "[(@{/long-polling/time})]",
+            method: "get"
+        }).done(function(response) {
+            app.time2 = response;
+        }).fail(function(error) {
+            console.log(error);
+        }).always(function() {
+            setTimeout(loop(), 0);
+        });
+    })();
+
+    if (!!window.EventSource) {
+        var es = new EventSource("[[@{/sse/time}]]");
+        es.onmessage = function(message) {
+            console.log("EventSource接收到了数据" + message);
+            app.time3 = parseInt(message.data);
+        }
+        es.onopen = function(e) {
+            console.log("EventSource连接到了服务器.");
+        }
+        es.onerror = function(e) {
+            console.log("EventSource连接出错了.");
+        }
+
+        var es2 = new EventSource("[[@{/sse/emitter/time}]]");
+        es2.onmessage = function(message) {
+            console.log("EventSource2接收到了数据" + message);
+            app.time4 = parseInt(message.data);
+        }
+        es2.onopen = function(e) {
+            console.log("EventSource2连接到了服务器.");
+        }
+        es2.onerror = function(e) {
+            console.log("EventSource2连接出错了.");
+        }
+    } else {
+        console.log("您的浏览器不支持SSE.");
+    }
+});
+</script>
+</head>
+<body>
+<div id="app">
+    <div>服务器时间-ajax短轮询：{{moment(time).format(format)}}</div>
+    <div>服务器时间-ajax长轮询：{{moment(time2).format(format)}}</div>
+    <div>服务器时间-SSE：{{moment(time3).format(format)}}</div>
+    <div>服务器时间-SSE-Emitter：{{moment(time4).format(format)}}</div>
+</div>
+</body>
+</html>
