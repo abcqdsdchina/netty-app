@@ -10,17 +10,20 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
 
+/**
+ * @author qian3
+ */
 @Slf4j
 @ChannelHandler.Sharable
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
-    public static final String MESSAGE_TEMPALTE = "Hello, {0}! Your message has been recieved." + NettyServer.DELIMITER;
+    public static final String MESSAGE_TEMPLATE = "Hello, {0}! Your message has been received." + NettyServer.DELIMITER;
 
     @Override
     public void channelRead(ChannelHandlerContext context, Object buffer) {
         String message = ((ByteBuf) buffer).toString(CharsetUtil.UTF_8);
         log.info("接收到消息：{}", message);
-        String response = MessageFormat.format(MESSAGE_TEMPALTE, message);
+        String response = MessageFormat.format(MESSAGE_TEMPLATE, message);
         context.write(Unpooled.copiedBuffer(response, CharsetUtil.UTF_8));
         log.info("发送了响应消息：{}", response);
     }
