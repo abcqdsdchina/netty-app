@@ -8,18 +8,21 @@ import lombok.Cleanup;
 
 import java.net.InetSocketAddress;
 
+/**
+ * @author qian3
+ */
 public class NettyClient {
 
-    private String host = "localhost";
-    private int port = 6001;
+    private static final String HOST = "localhost";
+    private static final int PORT = 6001;
 
     public void start() throws InterruptedException {
         @Cleanup ClosableNioEventLoopGroup group = new ClosableNioEventLoopGroup();
-        Bootstrap boostrap = new Bootstrap().group(group)
+        Bootstrap bootstrap = new Bootstrap().group(group)
                 .channel(NioSocketChannel.class)
-                .remoteAddress(new InetSocketAddress(host, port))
+                .remoteAddress(new InetSocketAddress(HOST, PORT))
                 .handler(new NettyClientHandler());
-        ChannelFuture f = boostrap.connect().sync();
+        ChannelFuture f = bootstrap.connect().sync();
         f.channel().closeFuture().sync();
     }
 
