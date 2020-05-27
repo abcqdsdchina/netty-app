@@ -13,18 +13,21 @@ import lombok.Cleanup;
 
 import java.net.InetSocketAddress;
 
+/**
+ * @author qian3
+ */
 public class NettyServer {
 
     public static final String DELIMITER = "@";
 
-    private final int port = 6001;
+    private final static int PORT = 6001;
 
     public void start() throws InterruptedException {
         final NettyServerHandler handler = new NettyServerHandler();
         @Cleanup ClosableNioEventLoopGroup group = new ClosableNioEventLoopGroup();
-        ServerBootstrap boostrap = new ServerBootstrap().group(group)
+        ServerBootstrap bootstrap = new ServerBootstrap().group(group)
                 .channel(NioServerSocketChannel.class)
-                .localAddress(new InetSocketAddress(port))
+                .localAddress(new InetSocketAddress(PORT))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel channel) {
@@ -32,7 +35,7 @@ public class NettyServer {
                         channel.pipeline().addLast(handler);
                     }
                 });
-        ChannelFuture f = boostrap.bind().sync();
+        ChannelFuture f = bootstrap.bind().sync();
         f.channel().closeFuture().sync();
     }
 
