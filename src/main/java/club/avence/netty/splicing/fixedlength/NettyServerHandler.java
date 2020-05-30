@@ -14,14 +14,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 @ChannelHandler.Sharable
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
-    private AtomicInteger count = new AtomicInteger(0);
+    private static final AtomicInteger COUNT = new AtomicInteger(0);
 
     @Override
     public void channelRead(ChannelHandlerContext context, Object buffer) {
         String message = ((ByteBuf) buffer).toString(CharsetUtil.UTF_8);
         log.info("接收到消息：{}", message);
         context.write(Unpooled.copiedBuffer(NettyClient.MESSAGE, CharsetUtil.UTF_8));
-        log.info("发送了第{}个响应消息：{}", count.incrementAndGet(), NettyClient.MESSAGE);
+        log.info("发送了第{}个响应消息：{}", COUNT.incrementAndGet(), NettyClient.MESSAGE);
     }
 
     @Override
