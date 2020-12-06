@@ -5,7 +5,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketClientProtocolHandler;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
-import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +28,8 @@ public class NettyWebSocketClientHandler extends SimpleChannelInboundHandler<Web
     }
 
     @Override
-    @SneakyThrows
     public void channelActive(ChannelHandlerContext context) {
-        log.info("Channel actived.");
+        log.info("Channel is active.");
     }
 
     @Override

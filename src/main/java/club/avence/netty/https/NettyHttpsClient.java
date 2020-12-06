@@ -11,8 +11,6 @@ import io.netty.handler.codec.http.HttpContentDecompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import lombok.Cleanup;
-import lombok.SneakyThrows;
 
 import java.net.InetSocketAddress;
 
@@ -24,27 +22,34 @@ public class NettyHttpsClient {
     public static final String HOST = "localhost";
     public static final int PORT = 6001;
 
-    @SneakyThrows
     public void start() {
-        @Cleanup ClosableNioEventLoopGroup group = new ClosableNioEventLoopGroup();
-        Bootstrap boostrap = new Bootstrap().group(group)
-                .channel(NioSocketChannel.class)
-                .remoteAddress(new InetSocketAddress(HOST, PORT))
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    @SneakyThrows
-                    protected void initChannel(SocketChannel channel) {
-                        channel.pipeline().addLast(SslContextBuilder.forClient()
-                                .trustManager(InsecureTrustManagerFactory.INSTANCE).build()
-                                .newHandler(channel.alloc()));
-                        channel.pipeline().addLast(new HttpClientCodec());
-                        channel.pipeline().addLast(new HttpObjectAggregator(10 * 1024 * 1024));
-                        channel.pipeline().addLast(new HttpContentDecompressor());
-                        channel.pipeline().addLast(new NettyHttpsClientHandler());
-                    }
-                });
-        ChannelFuture f = boostrap.connect().sync();
-        f.channel().closeFuture().sync();
+        try {
+            ClosableNioEventLoopGroup group = new ClosableNioEventLoopGroup();
+            Bootstrap boostrap = new Bootstrap().group(group)
+                    .channel(NioSocketChannel.class)
+                    .remoteAddress(new InetSocketAddress(HOST, PORT))
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel channel) {
+                            try {
+                                channel.pipeline().addLast(SslContextBuilder.forClient()
+                                        .trustManager(InsecureTrustManagerFactory.INSTANCE).build()
+                                        .newHandler(channel.alloc()));
+                                channel.pipeline().addLast(new HttpClientCodec());
+                                channel.pipeline().addLast(new HttpObjectAggregator(10 * 1024 * 1024));
+                                channel.pipeline().addLast(new HttpContentDecompressor());
+                                channel.pipeline().addLast(new NettyHttpsClientHandler());
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    });
+            ChannelFuture f = boostrap.connect().sync();
+            f.channel().closeFuture().sync();
+            group.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void main(String[] args) {

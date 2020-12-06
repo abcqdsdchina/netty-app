@@ -9,7 +9,6 @@ import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.util.CharsetUtil;
 import lombok.Cleanup;
-import lombok.SneakyThrows;
 
 import java.net.InetSocketAddress;
 
@@ -21,18 +20,21 @@ public class NettyClient {
     private static final String HOST = "localhost";
     private static final int PORT = 6001;
 
-    @SneakyThrows(Exception.class)
     public void start() {
-        @Cleanup ClosableNioEventLoopGroup group = new ClosableNioEventLoopGroup();
-        Bootstrap boostrap = new Bootstrap().group(group)
-                .channel(NioDatagramChannel.class)
-                .remoteAddress(new InetSocketAddress(HOST, PORT))
-                .handler(new NettyClientHandler());
-        Channel channel = boostrap.bind(0).sync().channel();
-        channel.writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer("Qian", CharsetUtil.UTF_8),
-                new InetSocketAddress("127.0.0.1", 6789)));
-        ChannelFuture future = channel.closeFuture();
-        future.await(3000);
+        try {
+            @Cleanup ClosableNioEventLoopGroup group = new ClosableNioEventLoopGroup();
+            Bootstrap boostrap = new Bootstrap().group(group)
+                    .channel(NioDatagramChannel.class)
+                    .remoteAddress(new InetSocketAddress(HOST, PORT))
+                    .handler(new NettyClientHandler());
+            Channel channel = boostrap.bind(0).sync().channel();
+            channel.writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer("Qian", CharsetUtil.UTF_8),
+                    new InetSocketAddress("127.0.0.1", 6789)));
+            ChannelFuture future = channel.closeFuture();
+            future.await(3000);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void main(String[] args) {

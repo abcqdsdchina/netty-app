@@ -6,7 +6,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
-import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,20 +31,23 @@ public class NettyHttpsClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    @SneakyThrows
     public void channelActive(ChannelHandlerContext context) {
-        URI uri = new URI("/");
+        try {
+            URI uri = new URI("/");
 
-        FullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET,
-                uri.toASCIIString(), Unpooled.wrappedBuffer(MESSAGE_TEMPLATE.getBytes(StandardCharsets.UTF_8)));
+            FullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET,
+                    uri.toASCIIString(), Unpooled.wrappedBuffer(MESSAGE_TEMPLATE.getBytes(StandardCharsets.UTF_8)));
 
-        HttpHeaders headers = request.headers();
-        headers.set(HttpHeaderNames.HOST, NettyHttpsClient.HOST);
-        headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-        headers.set(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
+            HttpHeaders headers = request.headers();
+            headers.set(HttpHeaderNames.HOST, NettyHttpsClient.HOST);
+            headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+            headers.set(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
 
-        context.channel().write(request);
-        context.channel().flush();
+            context.channel().write(request);
+            context.channel().flush();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

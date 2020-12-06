@@ -6,18 +6,17 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 
-/**
- * @author qian3
- */
-@Slf4j
 @ChannelHandler.Sharable
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
-    public static final String MESSAGE_TEMPLATE = "Hello, {0}! Your message has been received." + NettyServer.DELIMITER;
+    private static final Logger log = LoggerFactory.getLogger(NettyServerHandler.class);
+
+    public static final String MESSAGE_TEMPLATE = "Hello, {0}! Your message has been recieved." + NettyServer.DELIMITER;
 
     @Override
     public void channelRead(ChannelHandlerContext context, Object buffer) {

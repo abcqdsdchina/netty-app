@@ -5,8 +5,6 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.socket.nio.NioDatagramChannel;
-import lombok.Cleanup;
-import lombok.SneakyThrows;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -15,20 +13,23 @@ import java.util.concurrent.CountDownLatch;
  */
 public class NettyServer {
 
-    private CountDownLatch latch = new CountDownLatch(1);
+    private final CountDownLatch latch = new CountDownLatch(1);
 
-    @SneakyThrows(Exception.class)
     public void start() {
-        final NettyServerHandler handler = new NettyServerHandler();
-        @Cleanup ClosableNioEventLoopGroup group = new ClosableNioEventLoopGroup();
-        Bootstrap boostrap = new Bootstrap().group(group)
-                .channel(NioDatagramChannel.class)
-                .option(ChannelOption.SO_BROADCAST, true)
-                .option(ChannelOption.SO_REUSEADDR, true)
-                .handler(handler);
-        ChannelFuture f = boostrap.bind(6789).sync();
-        latch.await();
-        f.channel().closeFuture().sync();
+        try {
+            final NettyServerHandler handler = new NettyServerHandler();
+            ClosableNioEventLoopGroup group = new ClosableNioEventLoopGroup();
+            Bootstrap boostrap = new Bootstrap().group(group)
+                    .channel(NioDatagramChannel.class)
+                    .option(ChannelOption.SO_BROADCAST, true)
+                    .option(ChannelOption.SO_REUSEADDR, true)
+                    .handler(handler);
+            ChannelFuture f = boostrap.bind(6789).sync();
+            latch.await();
+            f.channel().closeFuture().sync();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void main(String[] args) {
