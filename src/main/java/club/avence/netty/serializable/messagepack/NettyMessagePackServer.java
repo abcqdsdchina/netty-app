@@ -15,7 +15,7 @@ import java.net.InetSocketAddress;
 
 public class NettyMessagePackServer {
 
-    private final int port = 6001;
+    private static final int PORT = 6001;
 
     @SneakyThrows
     public void start() {
@@ -23,7 +23,7 @@ public class NettyMessagePackServer {
         @Cleanup ClosableNioEventLoopGroup group = new ClosableNioEventLoopGroup();
         ServerBootstrap boostrap = new ServerBootstrap().group(group)
                 .channel(NioServerSocketChannel.class)
-                .localAddress(new InetSocketAddress(port))
+                .localAddress(new InetSocketAddress(PORT))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel channel) {

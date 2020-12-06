@@ -6,10 +6,17 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 import lombok.SneakyThrows;
 import org.msgpack.core.MessagePack;
 import org.msgpack.core.MessageUnpacker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+/**
+ * @author c_qiancheng
+ */
 public class MessagePackDecoder extends MessageToMessageDecoder<ByteBuf> {
+
+    private static final Logger log = LoggerFactory.getLogger(MessagePackDecoder.class);
 
     @Override
     @SneakyThrows

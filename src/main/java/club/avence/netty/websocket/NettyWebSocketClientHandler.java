@@ -6,10 +6,15 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketClientProtocolHandler;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
+/**
+ * @author c_qiancheng
+ */
 public class NettyWebSocketClientHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
+
+    private static final Logger log = LoggerFactory.getLogger(NettyWebSocketClientHandler.class);
 
     private static final String MESSAGE_TEMPLATE = "我来了！";
 

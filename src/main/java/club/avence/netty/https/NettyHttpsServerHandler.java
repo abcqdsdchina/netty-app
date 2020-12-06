@@ -8,14 +8,16 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 import lombok.Cleanup;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author qian3
  */
-@Slf4j
 @ChannelHandler.Sharable
 public class NettyHttpsServerHandler extends ChannelInboundHandlerAdapter {
+
+    private static final Logger log = LoggerFactory.getLogger(NettyHttpsServerHandler.class);
 
     private static final String MESSAGE_TEMPLATE = "你好！消息已经收到.";
 

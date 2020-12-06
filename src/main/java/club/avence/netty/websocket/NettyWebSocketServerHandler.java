@@ -10,14 +10,20 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.util.concurrent.ImmediateEventExecutor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
+/**
+ * @author c_qiancheng
+ */
 @ChannelHandler.Sharable
 public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
 
+    private static final Logger log = LoggerFactory.getLogger(NettyWebSocketServerHandler.class);
+
     private static final String MESSAGE_TEMPLATE = "你好！消息已经收到.";
 
-    private ChannelGroup group = new DefaultChannelGroup(ImmediateEventExecutor.INSTANCE);
+    private final ChannelGroup group = new DefaultChannelGroup(ImmediateEventExecutor.INSTANCE);
 
     @Override
     protected void channelRead0(ChannelHandlerContext context, WebSocketFrame frame) {

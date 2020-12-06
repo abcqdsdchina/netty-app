@@ -21,12 +21,15 @@ import lombok.SneakyThrows;
 import java.net.InetSocketAddress;
 import java.net.URI;
 
+/**
+ * @author qiancheng
+ */
 public class NettyWebSocketClient {
 
     private static final String HOST = "localhost";
     private static final int PORT = 6001;
 
-    private static final String WEBSOCKET_PATH = "ws://" + HOST + ":" + 6001 + "/websocket/endpoint";
+    private static final String WEB_SOCKET_PATH = "ws://" + HOST + ":" + 6001 + "/websocket/endpoint";
 
     @SneakyThrows
     public void start() {
@@ -44,7 +47,7 @@ public class NettyWebSocketClient {
                         channel.pipeline().addLast(new HttpObjectAggregator(10 * 1024 * 1024));
                         channel.pipeline().addLast(WebSocketClientCompressionHandler.INSTANCE);
                         channel.pipeline().addLast(new WebSocketClientProtocolHandler(
-                                WebSocketClientHandshakerFactory.newHandshaker(new URI(WEBSOCKET_PATH), WebSocketVersion.V13,
+                                WebSocketClientHandshakerFactory.newHandshaker(new URI(WEB_SOCKET_PATH), WebSocketVersion.V13,
                                         null, true, new DefaultHttpHeaders()), true
                         ));
                         channel.pipeline().addLast(new NettyWebSocketClientHandler());

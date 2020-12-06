@@ -7,7 +7,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -15,8 +16,9 @@ import java.nio.charset.StandardCharsets;
 /**
  * @author qian3
  */
-@Slf4j
 public class NettyHttpsClientHandler extends ChannelInboundHandlerAdapter {
+
+    private static final Logger log = LoggerFactory.getLogger(NettyHttpsClientHandler.class);
 
     private static final String MESSAGE_TEMPLATE = "我来了！";
 

@@ -2,10 +2,12 @@ package club.avence.netty.serializable.messagepack;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 public class NettyMessagePackClientHandler extends SimpleChannelInboundHandler<Employee> {
+
+    private static final Logger log = LoggerFactory.getLogger(NettyMessagePackClientHandler.class);
 
     @Override
     protected void channelRead0(ChannelHandlerContext context, Employee message) {
